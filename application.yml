@@ -13,6 +13,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+    show-sql: true
   kafka:
     consumer:
       group-id: midas-group
@@ -20,16 +21,23 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
-        spring.json.trusted.packages: "com.jpmc.midas"
+        spring.json.trusted.packages: "com.jpmc.midascore"
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    admin:
+      fail-fast: false
 
 app:
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:${spring.kafka.bootstrap-servers:localhost:9092}}
     topic:
       transactions: midas-transactions
+    listeners:
+      auto-startup: true
 
 incentive:
   base-url: http://localhost:8081
+
+general:
+  kafka-topic: ${APP_GENERAL_KAFKA_TOPIC:midas-transactions}
