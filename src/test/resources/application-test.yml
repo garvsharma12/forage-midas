@@ -1,0 +1,18 @@
+spring:
+  kafka:
+    bootstrap-servers: ${spring.embedded.kafka.brokers}
+  main:
+    banner-mode: off
+
+logging:
+  level:
+    org.apache.kafka: WARN
+    org.springframework.kafka: INFO
+
+app:
+  kafka:
+    bootstrap-servers: ${spring.embedded.kafka.brokers}
+    listeners:
+      auto-startup: true
+    admin:
+      auto-create-topics: true

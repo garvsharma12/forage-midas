@@ -58,6 +58,31 @@ public class KafkaConfig {
         return factory;
     }
 
+    // Consumer for foundation.Transaction used in tests
+    @Bean
+    public ConsumerFactory<String, Transaction> transactionConsumerFactory() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        if (consumerGroupId != null && !consumerGroupId.isBlank()) {
+            props.put(ConsumerConfig.GROUP_ID_CONFIG, consumerGroupId);
+        }
+        JsonDeserializer<Transaction> valueDeserializer = new JsonDeserializer<>(Transaction.class);
+        valueDeserializer.addTrustedPackages("com.jpmc.midascore");
+        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), valueDeserializer);
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, Transaction> transactionListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, Transaction> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(transactionConsumerFactory());
+        factory.getContainerProperties().setAckMode(org.springframework.kafka.listener.ContainerProperties.AckMode.MANUAL_IMMEDIATE);
+        factory.setConcurrency(1);
+        factory.setAutoStartup(listenersAutoStartup);
+        return factory;
+    }
+
     // Producer
     @Bean
     public ProducerFactory<String, TransactionDTO> producerFactory() {

@@ -1,0 +1,30 @@
+spring:
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: midas-group
+      auto-offset-reset: earliest
+      properties:
+        spring.json.trusted.packages: "com.jpmc.midascore"
+    producer:
+      properties:
+        spring.json.add.type.headers: false
+    admin:
+      fail-fast: false
+
+app:
+  kafka:
+    listeners:
+      auto-startup: false
+    topic:
+      transactions: midas-transactions
+    admin:
+      auto-create-topics: false
+
+general:
+  kafka-topic: ${APP_GENERAL_KAFKA_TOPIC:midas-transactions}
+
+logging:
+  level:
+    org.apache.kafka: ERROR
+    org.springframework.kafka: WARN
