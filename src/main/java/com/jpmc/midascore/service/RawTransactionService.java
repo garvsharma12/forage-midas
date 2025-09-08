@@ -13,10 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class RawTransactionService {
     private final UserRepository userRepository;
     private final TransactionRecordRepository recordRepository;
+    private final IncentiveClient incentiveClient;
 
-    public RawTransactionService(UserRepository userRepository, TransactionRecordRepository recordRepository) {
+    public RawTransactionService(UserRepository userRepository, TransactionRecordRepository recordRepository, IncentiveClient incentiveClient) {
         this.userRepository = userRepository;
         this.recordRepository = recordRepository;
+        this.incentiveClient = incentiveClient;
     }
 
     @Transactional
@@ -34,9 +36,21 @@ public class RawTransactionService {
             return false;
         }
 
-        // Apply balance updates
+        // Fetch incentive from external API
+        float incentive = 0f;
+        try {
+            incentive = incentiveClient.fetchIncentive(new com.jpmc.midascore.foundation.Transaction(
+                    tx.getSenderId(), tx.getRecipientId(), tx.getAmount()
+            ));
+            if (incentive < 0f) incentive = 0f;
+        } catch (Exception ex) {
+            // If the external service fails, treat incentive as 0 and continue
+            incentive = 0f;
+        }
+
+        // Apply balance updates (note: sender pays only original amount; recipient gets amount + incentive)
         sender.setBalance(sender.getBalance() - amount);
-        recipient.setBalance(recipient.getBalance() + amount);
+        recipient.setBalance(recipient.getBalance() + amount + incentive);
 
         // Persist entities
         userRepository.save(sender);
@@ -45,7 +59,8 @@ public class RawTransactionService {
         TransactionRecord record = new TransactionRecord();
         record.setSender(sender);
         record.setRecipient(recipient);
-        record.setAmount(amount);
+    record.setAmount(amount);
+    record.setIncentive(incentive);
         recordRepository.save(record);
         return true;
     }

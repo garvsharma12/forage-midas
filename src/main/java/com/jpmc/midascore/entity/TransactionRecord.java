@@ -21,6 +21,9 @@ public class TransactionRecord {
     @Column(nullable = false)
     private float amount;
 
+    @Column(nullable = false)
+    private float incentive = 0f;
+
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -53,6 +56,14 @@ public class TransactionRecord {
 
     public void setAmount(float amount) {
         this.amount = amount;
+    }
+
+    public float getIncentive() {
+        return incentive;
+    }
+
+    public void setIncentive(float incentive) {
+        this.incentive = incentive;
     }
 
     public Instant getCreatedAt() {
