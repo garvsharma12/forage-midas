@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.annotation.DirtiesContext;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = "server.port=33400")
 @org.springframework.test.context.ActiveProfiles("test")
 @DirtiesContext
 @EmbeddedKafka(partitions = 1, topics = {"midas-transactions"}, bootstrapServersProperty = "spring.kafka.bootstrap-servers")

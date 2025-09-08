@@ -4,6 +4,9 @@ spring:
   main:
     banner-mode: off
 
+server:
+  port: 33400
+
 logging:
   level:
     org.apache.kafka: WARN

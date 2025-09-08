@@ -28,3 +28,6 @@ logging:
   level:
     org.apache.kafka: ERROR
     org.springframework.kafka: WARN
+
+server:
+  port: 33400
